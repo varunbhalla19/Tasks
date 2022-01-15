@@ -1,5 +1,6 @@
 package com.project.tasks
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,18 +8,15 @@ import com.project.tasks.data.TaskItem
 
 class TasksViewModel: ViewModel() {
 
-    private var _tasks= MutableLiveData(listOf<TaskItem>())
-    val tasks: LiveData<List<TaskItem>> = _tasks
-
+    var tasks = mutableStateListOf<TaskItem>()
+    private set
 
     fun addTask(task: TaskItem){
-        _tasks.value = _tasks.value!!.plus(listOf(task))
+        tasks.add(task)
     }
 
     fun removeTask(task: TaskItem){
-        _tasks.value = _tasks.value!!.toMutableList().also {
-            it.remove(task)
-        }
+        tasks.remove(task)
     }
 
 }

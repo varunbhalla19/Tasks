@@ -7,15 +7,13 @@ import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.ExperimentalComposeUiApi
 import com.project.tasks.ui.components.Screen
 import com.project.tasks.ui.theme.TasksTheme
 
 class MainActivity : ComponentActivity() {
 
-    val tasksViewModel by viewModels<TasksViewModel>()
+    private val tasksViewModel by viewModels<TasksViewModel>()
 
     @ExperimentalAnimationApi
     @ExperimentalComposeUiApi
@@ -37,10 +35,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ActivityScreen( viewModel: TasksViewModel ){
 
-    val tasks by viewModel.tasks.observeAsState(listOf())
-
     Screen(
-        tasks = tasks,
+        tasks = viewModel.tasks,
         onAddItem = { viewModel.addTask(it) },
         onRemove = { viewModel.removeTask(it) }
     )
@@ -154,4 +150,4 @@ fun ActivityScreen( viewModel: TasksViewModel ){
 // mutableStateListOf allows us to create an instance of MutableList that is observable.
 // This means that we can work with todoItems in the same way we work with a MutableList, removing the overhead of working with LiveData<List>.
 
-
+// The work done with mutableStateListOf and MutableState is intended for Compose.
