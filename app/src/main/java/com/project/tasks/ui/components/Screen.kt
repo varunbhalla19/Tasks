@@ -15,11 +15,14 @@ import androidx.compose.ui.unit.dp
 import com.project.tasks.data.TaskItem
 import com.project.tasks.data.TodoIcon
 import com.project.tasks.ui.theme.TasksTheme
+import com.project.tasks.ui.util.generateRandomTodoItem
 
 
 @Composable
 fun Screen(
     tasks: List<TaskItem>,
+    onAddItem: (TaskItem) -> Unit = {},
+    onRemove: (TaskItem) -> Unit = {},
     modifier: Modifier = Modifier
 ){
     Column() {
@@ -28,16 +31,24 @@ fun Screen(
             Modifier.weight(1f).fillMaxWidth()
         ){
             this.items(items = tasks){
-                item -> TaskRow(task = item, onClick = {})
+                item -> TaskRow(
+                task = item,
+                onClick = {
+                    onRemove(item)
+                }
+            )
             }
         }
         
-        Button(onClick = {}, modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth() ) {
-
+        Button(
+            onClick = {
+                onAddItem(generateRandomTodoItem())
+            },
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
             Text(text = "Add Item")
-
         }
         
     }
@@ -51,7 +62,7 @@ fun TaskRow(
 ){
     Row(
         Modifier
-            .clickable { }
+            .clickable { onClick() }
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
