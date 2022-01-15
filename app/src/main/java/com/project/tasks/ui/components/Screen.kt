@@ -1,56 +1,55 @@
 package com.project.tasks.ui.components
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.tasks.data.TaskItem
 import com.project.tasks.data.TodoIcon
 import com.project.tasks.ui.theme.TasksTheme
-import com.project.tasks.ui.util.generateRandomTodoItem
 
 
+@ExperimentalAnimationApi
+@ExperimentalComposeUiApi
 @Composable
 fun Screen(
     tasks: List<TaskItem>,
     onAddItem: (TaskItem) -> Unit = {},
     onRemove: (TaskItem) -> Unit = {},
-    modifier: Modifier = Modifier
 ){
-    Column() {
-        
+    Column {
+        TodoItemInputBackground(
+            elevate = true,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            TodoInputRow(onItemComplete = onAddItem)
+        }
         LazyColumn(
-            Modifier.weight(1f).fillMaxWidth()
+            Modifier
+                .weight(1f)
+                .fillMaxWidth()
         ){
             this.items(items = tasks){
-                item -> TaskRow(
-                task = item,
-                onClick = {
-                    onRemove(item)
-                }
-            )
+                item -> TaskRow( task = item, onClick = { onRemove(item) } )
             }
         }
-        
-        Button(
-            onClick = {
-                onAddItem(generateRandomTodoItem())
-            },
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            Text(text = "Add Item")
-        }
-        
     }
 }
 
@@ -61,7 +60,7 @@ fun TaskRow(
     modifier: Modifier = Modifier
 ){
     Row(
-        Modifier
+        modifier
             .clickable { onClick() }
             .fillMaxWidth()
             .padding(16.dp),
@@ -69,13 +68,112 @@ fun TaskRow(
     ) {
         Text(task.task)
         Icon(
-            task.icon.imageVector,
-            task.icon.description
+            imageVector = task.icon.imageVector,
+            contentDescription = task.icon.description,
         )
     }
 }
 
+@Composable
+fun TodoItemInputBackground(
+    elevate: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
+    val animatedElevation by animateDpAsState(if (elevate) 1.dp else 0.dp, TweenSpec(500))
+    Surface(
+        color = MaterialTheme.colors.onSurface.copy(alpha = 0.05f),
+        elevation = animatedElevation,
+        shape = RectangleShape,
+    ) {
+        Row(
+            modifier = modifier.animateContentSize(animationSpec = TweenSpec(300)),
+            content = content
+        )
+    }
+}
 
+@ExperimentalAnimationApi
+@Composable
+fun AnimatedIconsRow(
+    icon: TodoIcon,
+    setIcon: (TodoIcon) -> Unit,
+    modifier: Modifier = Modifier,
+    visible: Boolean = true
+){
+    val enter = remember { fadeIn(animationSpec = TweenSpec(300, easing = FastOutLinearInEasing)) }
+    val exit = remember { fadeOut(animationSpec = TweenSpec(100, easing = FastOutSlowInEasing)) }
+    
+    Box(modifier = modifier.defaultMinSize(minHeight = 16.dp)){
+        AnimatedVisibility(
+            visible = visible,
+            enter = enter,
+            exit = exit
+        ) {
+            IconsRow(icon = icon, onIconChange = setIcon)
+        }
+    }
+}
+
+@Composable
+fun IconsRow(
+    icon: TodoIcon,
+    onIconChange: (TodoIcon) -> Unit,
+    modifier: Modifier = Modifier
+){
+    Row(modifier){
+        TodoIcon.values().forEach {
+            SelectableIconButton(
+                icon = it.imageVector,
+                description = it.description,
+                onIconSelected = { onIconChange(it) },
+                isSelected = it == icon
+            )
+        }
+    }
+}
+
+@Composable
+fun SelectableIconButton(
+    icon: ImageVector,
+    description: String,
+    onIconSelected: () -> Unit,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier
+){
+    val tint = if(isSelected){
+        MaterialTheme.colors.primary
+    } else {
+        MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+    }
+    TextButton(
+        onClick = onIconSelected,
+        shape = CircleShape,
+        modifier = modifier
+    ) {
+        Column {
+            Icon(
+                imageVector = icon,
+                tint = tint,
+                contentDescription = description
+            )
+            if (isSelected) {
+                Box(
+                    Modifier
+                        .padding(top = 3.dp)
+                        .width(icon.defaultWidth)
+                        .height(1.dp)
+                        .background(tint)
+                )
+            } else {
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+        }
+    }
+}
+
+@ExperimentalAnimationApi
+@ExperimentalComposeUiApi
 @Preview
 @Composable
 fun PreviewTodoScreen() {
