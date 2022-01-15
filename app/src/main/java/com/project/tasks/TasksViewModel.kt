@@ -7,16 +7,18 @@ import com.project.tasks.data.TaskItem
 
 class TasksViewModel: ViewModel() {
 
-    private var _tasks= MutableLiveData(mutableListOf<TaskItem>())
-    val tasks: LiveData<MutableList<TaskItem>> = _tasks
+    private var _tasks= MutableLiveData(listOf<TaskItem>())
+    val tasks: LiveData<List<TaskItem>> = _tasks
 
 
     fun addTask(task: TaskItem){
-        _tasks.value?.add(task)
+        _tasks.value = _tasks.value!!.plus(listOf(task))
     }
 
     fun removeTask(task: TaskItem){
-        _tasks.value?.remove(task)
+        _tasks.value = _tasks.value!!.toMutableList().also {
+            it.remove(task)
+        }
     }
 
 }
