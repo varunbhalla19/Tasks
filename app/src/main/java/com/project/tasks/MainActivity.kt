@@ -35,11 +35,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ActivityScreen( viewModel: TasksViewModel ){
 
-    Screen(
-        tasks = viewModel.tasks,
-        onAddItem = { viewModel.addTask(it) },
-        onRemove = { viewModel.removeTask(it) }
-    )
+    with(viewModel){
+        Screen(
+            tasks = tasks,
+            onAddItem = ::addTask,
+            onRemove = ::removeTask,
+            onEditDone = ::onEditDone,
+            onEditItemChange = ::onEditItemChange,
+            onStartEdit = ::onEditItemSelected,
+            currentlyEditing = currentEditItem
+        )
+    }
 }
 
 //A ViewModel lets you extract state from your UI and define events that the UI can call to update that state.
@@ -151,3 +157,5 @@ fun ActivityScreen( viewModel: TasksViewModel ){
 // This means that we can work with todoItems in the same way we work with a MutableList, removing the overhead of working with LiveData<List>.
 
 // The work done with mutableStateListOf and MutableState is intended for Compose.
+
+// If you had defined currentEditPosition as a regular Int (private var currentEditPosition = -1),
