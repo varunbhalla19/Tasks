@@ -31,26 +31,62 @@ import com.project.tasks.ui.theme.TasksTheme
 @Composable
 fun Screen(
     tasks: List<TaskItem>,
+    currentlyEditing: TaskItem?,
     onAddItem: (TaskItem) -> Unit = {},
     onRemove: (TaskItem) -> Unit = {},
+    onStartEdit: (TaskItem) -> Unit,
+    onEditItemChange: (TaskItem) -> Unit,
+    onEditDone: () -> Unit
 ){
     Column {
-        TodoItemInputBackground(
-            elevate = true,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            TodoInputRow(onItemComplete = onAddItem)
-        }
+
         LazyColumn(
             Modifier
                 .weight(1f)
                 .fillMaxWidth()
         ){
-            this.items(items = tasks){
-                item -> TaskRow( task = item, onClick = { onRemove(item) } )
+            this.items(items = tasks){ item ->
+                if(currentlyEditing?.id == item.id){
+                    TodoInlineEdit(
+                        item = currentlyEditing,
+                        onEditItemChange = onEditItemChange,
+                        onEditDone = onEditDone,
+                        onRemove = {onRemove(item)}
+                    )
+                }else {
+                    TaskRow( task = item, onClick = { onStartEdit(item) } )
+                }
+            }
+        }
+
+        TodoItemInputBackground(
+            elevate = true,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if( currentlyEditing == null ){
+                TodoInputRow(onItemComplete = onAddItem)
             }
         }
     }
+}
+
+@ExperimentalComposeUiApi
+@ExperimentalAnimationApi
+@Composable
+fun TodoInlineEdit(
+    item: TaskItem,
+    onEditItemChange: (TaskItem) -> Unit,
+    onEditDone: () -> Unit,
+    onRemove: (TaskItem) -> Unit
+){
+    TodoItemInput(
+        text = item.task,
+        setText = { onEditItemChange(item.copy(task = it)) },
+        icon = item.icon,
+        setIcon = { onEditItemChange(item.copy(icon = it)) },
+        enabled = true,
+        submit = onEditDone
+    )
 }
 
 @Composable
@@ -185,7 +221,7 @@ fun PreviewTodoScreen() {
     )
     TasksTheme {
         Surface{
-            Screen(items)
+//            Screen(items)
         }
     }
 }
