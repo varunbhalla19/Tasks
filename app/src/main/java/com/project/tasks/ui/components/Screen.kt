@@ -19,6 +19,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.tasks.data.TaskItem
@@ -77,7 +78,7 @@ fun TodoInlineEdit(
     item: TaskItem,
     onEditItemChange: (TaskItem) -> Unit,
     onEditDone: () -> Unit,
-    onRemove: (TaskItem) -> Unit
+    onRemove: () -> Unit
 ){
     TodoItemInput(
         text = item.task,
@@ -86,7 +87,25 @@ fun TodoInlineEdit(
         setIcon = { onEditItemChange(item.copy(icon = it)) },
         enabled = true,
         submit = onEditDone
-    )
+    ){
+        Row {
+            val shrinkButtons = Modifier.widthIn(20.dp)
+            TextButton(onClick = onEditDone, modifier = shrinkButtons) {
+                Text(
+                    text = "\uD83D\uDCBE",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(30.dp)
+                )
+            }
+            TextButton(onClick = onRemove, modifier = shrinkButtons) {
+                Text(
+                    text = "❌",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.width(30.dp)
+                )
+            }
+        }
+    }
 }
 
 @Composable

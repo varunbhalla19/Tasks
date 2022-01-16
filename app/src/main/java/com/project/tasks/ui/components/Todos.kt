@@ -1,9 +1,7 @@
 package com.project.tasks.ui.components
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -88,7 +86,13 @@ fun TodoInputRow(
         onItemComplete(TaskItem(text, icon))
         setText("")
     }
-    TodoItemInput(text = text, setText = setText, icon = icon, setIcon = setIcon, enabled = enabled, submit = submit)
+    TodoItemInput(text = text, setText = setText, icon = icon, setIcon = setIcon, enabled = enabled, submit = submit){
+        TodoEditButton(
+            onClick = submit,
+            text = "Add",
+            enabled = text.isNotBlank()
+        )
+    }
 }
 
 @ExperimentalAnimationApi
@@ -100,7 +104,8 @@ fun TodoItemInput(
     icon: TodoIcon,
     setIcon: (TodoIcon) -> Unit,
     enabled: Boolean,
-    submit: () -> Unit
+    submit: () -> Unit,
+    buttonSlot: @Composable() () -> Unit
 ) {
 
     Column() {
@@ -119,12 +124,12 @@ fun TodoItemInput(
                     .padding(end = 8.dp),
                 onImeAction = submit
             )
-            TodoEditButton(
-                onClick = submit,
-                text = "Add",
-                modifier = Modifier.align(Alignment.CenterVertically),
-                enabled = text.isNotBlank()
-            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Box(Modifier.align(Alignment.CenterVertically)) {
+                buttonSlot()
+            }
         }
 
         if( enabled ){
