@@ -158,4 +158,23 @@ fun ActivityScreen( viewModel: TasksViewModel ){
 
 // The work done with mutableStateListOf and MutableState is intended for Compose.
 
+// Compose will observe any State<T> read by a composable, even if the read happens in a regular Kotlin function called by the composable.
+// tasks.getOrNull(currentEditPosition)
+// Here we're reading from currentEditPosition and tasks to generate currentEditItem.
+
+// For State<T> transformations to work, the state must be read from a State<T> object.
+//
 // If you had defined currentEditPosition as a regular Int (private var currentEditPosition = -1),
+// compose would not be able to observe changes to it
+
+// Calling copy will make a copy of the data class with the parameter specified changed....
+
+// The LazyColumn composable is the compose equivalent of a RecyclerView.
+// It will only recompose the items on the list needed to display the current screen,
+// and as the user scrolls it will dispose of composables that left the screen and make new ones for the elements scrolling on.
+
+// Slots are parameters to a composable that allow the caller to describe a section of the screen. You'll find examples of slots throughout the built-in composable APIs.
+// One of the most commonly used examples is Scaffold.
+
+// Scaffold is the composable for describing an entire screen in Material design, such as the topBar, bottomBar, and body of the screen.
+// Declare a slot with a parameter of type @Composable () -> Unit.
